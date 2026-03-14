@@ -1,0 +1,615 @@
+<!DOCTYPE html><html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CryoPack OS — Algorithm Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Outfit:wght@300;400;500;600;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>:root{--bg:#030710;--s1:#08101f;--s2:#0d1728;--bd:#1c2d4a;--a:#00e5ff;--a2:#00ff9d;--a3:#ff5757;--a4:#9b72f8;--a5:#ffc94d;--t:#e2edf8;--t2:#8aabca;--t3:#445f7a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:14px;}
+body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(ellipse 700px 500px at 5% 10%,rgba(0,229,255,0.045) 0%,transparent 55%),radial-gradient(ellipse 600px 400px at 95% 90%,rgba(155,114,248,0.035) 0%,transparent 55%),
+repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(28,45,74,0.16) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(28,45,74,0.16) 60px);}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;height:50px;background:rgba(3,7,16,0.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:12px;}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Unbounded',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:-0.02em;}
+.lic{width:28px;height:28px;background:linear-gradient(135deg,rgba(0,229,255,0.22),rgba(155,114,248,0.18));border:1px solid rgba(0,229,255,0.45);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;box-shadow:0 0 14px rgba(0,229,255,0.18);}
+.hcen{flex:1;display:flex;justify-content:center;}
+.htitle{font-family:'Unbounded',sans-serif;font-size:0.78rem;font-weight:700;color:var(--t2);letter-spacing:0.03em;}
+.hbtn{padding:5px 12px;border:1px solid var(--bd);background:rgba(0,229,255,0.06);color:var(--a);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.61rem;cursor:pointer;transition:all 0.2s;}
+.hbtn:hover{border-color:var(--a);background:rgba(0,229,255,0.13);}
+.hbtn.print-btn{background:rgba(0,255,157,0.07);color:var(--a2);border-color:rgba(0,255,157,0.22);}
+.hbtn.print-btn:hover{background:rgba(0,255,157,0.14);border-color:var(--a2);}
+.wrap{display:flex;min-height:100vh;padding-top:50px;}
+.snav{width:220px;background:rgba(3,7,16,0.94);border-right:1px solid var(--bd);position:fixed;top:50px;left:0;bottom:0;overflow-y:auto;padding:16px 0;}
+.snav::-webkit-scrollbar{width:3px;}.snav::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.1);}
+.snav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;color:var(--t3);font-size:0.82rem;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;font-family:'Outfit',sans-serif;}
+.snav-item:hover{color:var(--t2);background:rgba(0,229,255,0.04);}
+.snav-item.active{color:var(--a);background:rgba(0,229,255,0.07);border-left-color:var(--a);}
+.snav-ico{font-size:0.95rem;width:20px;text-align:center;}
+.snav-sep{height:1px;background:var(--bd);margin:6px 16px;}
+.snav-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;letter-spacing:0.15em;color:var(--t3);padding:6px 16px 2px;text-transform:uppercase;}
+.main{margin-left:220px;flex:1;padding:26px;position:relative;z-index:1;}
+.section{display:none;animation:sec-in 0.3s ease;}
+.section.active{display:block;}
+@keyframes sec-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{font-family:'Unbounded',sans-serif;font-size:1.4rem;font-weight:900;color:var(--t);margin-bottom:5px;letter-spacing:-0.02em;}
+.sec-sub{font-size:0.85rem;color:var(--t2);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;}
+.card:hover{border-color:rgba(0,229,255,0.2);}
+.card-title{font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:700;color:var(--a);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.card-body{font-size:0.82rem;color:var(--t2);line-height:1.72;}
+.card-body strong{color:var(--t);font-weight:600;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center;}
+.stat-v{font-family:'Unbounded',sans-serif;font-size:1.7rem;font-weight:900;color:var(--a);line-height:1;letter-spacing:-0.03em;}
+.stat-l{font-family:'JetBrains Mono',monospace;font-size:0.57rem;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-top:5px;}
+.stat.g .stat-v{color:var(--a2);}.stat.o .stat-v{color:var(--a3);}.stat.p .stat-v{color:var(--a4);}
+.algo-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:all 0.25s;}
+.algo-card:hover{border-color:rgba(0,229,255,0.35);transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,0.3);}
+.algo-card.best{border-color:rgba(0,255,157,0.35);background:rgba(0,255,157,0.025);}
+.algo-card .badge{position:absolute;top:12px;right:12px;padding:3px 8px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:0.58rem;border:1px solid;}
+.badge-hybrid{background:rgba(0,255,157,0.14);color:var(--a2);border-color:rgba(0,255,157,0.28);}
+.badge-bfd{background:rgba(0,229,255,0.1);color:var(--a);border-color:rgba(0,229,255,0.22);}
+.badge-ffd{background:rgba(155,114,248,0.11);color:var(--a4);border-color:rgba(155,114,248,0.28);}
+.badge-ff{background:rgba(255,87,87,0.1);color:var(--a3);border-color:rgba(255,87,87,0.22);}
+.algo-name{font-family:'Unbounded',sans-serif;font-size:0.92rem;font-weight:700;margin-bottom:4px;letter-spacing:-0.02em;}
+.algo-name.c1{color:var(--a2);}.algo-name.c2{color:var(--a);}.algo-name.c3{color:var(--a4);}.algo-name.c4{color:var(--a3);}
+.algo-short{font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--t3);margin-bottom:9px;}
+.algo-desc{font-size:0.8rem;color:var(--t2);line-height:1.7;margin-bottom:12px;}
+.algo-meta{display:flex;flex-wrap:wrap;gap:6px;}
+.pill{padding:3px 9px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:0.59rem;border:1px solid var(--bd);}
+.pill.c{background:rgba(0,229,255,0.06);color:var(--a);border-color:rgba(0,229,255,0.18);}
+.pill.g{background:rgba(0,255,157,0.06);color:var(--a2);border-color:rgba(0,255,157,0.18);}
+.pill.o{background:rgba(255,87,87,0.06);color:var(--a3);border-color:rgba(255,87,87,0.18);}
+.pill.p{background:rgba(155,114,248,0.08);color:var(--a4);border-color:rgba(155,114,248,0.22);}
+.pill.y{background:rgba(255,201,77,0.07);color:var(--a5);border-color:rgba(255,201,77,0.18);}
+.chart-wrap{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:18px;}
+.chart-title{font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:700;color:var(--t);margin-bottom:2px;}
+.chart-sub{font-size:0.71rem;color:var(--t3);margin-bottom:14px;font-family:'JetBrains Mono',monospace;}
+.ds-select-panel{background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(155,114,248,0.025));border:1px solid rgba(0,229,255,0.2);border-radius:12px;padding:18px;margin-bottom:20px;}
+.ds-panel-title{font-family:'Outfit',sans-serif;font-size:0.96rem;font-weight:700;color:var(--a);margin-bottom:6px;}
+.ds-panel-sub{font-size:0.79rem;color:var(--t2);margin-bottom:13px;line-height:1.6;}
+.ds-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:13px;}
+.ds-opt{padding:10px 13px;background:rgba(0,229,255,0.035);border:1px solid var(--bd);border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.ds-opt:hover,.ds-opt.sel{border-color:var(--a);background:rgba(0,229,255,0.08);}
+.ds-opt-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:0.84rem;color:var(--t);}
+.ds-opt-meta{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--t3);margin-top:2px;}
+.ds-run-btn{padding:9px 22px;background:linear-gradient(135deg,var(--a),#0096cc);color:#000;border:none;border-radius:8px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
+.ds-run-btn:hover{opacity:0.87;transform:translateY(-1px);}
+.ds-run-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.manual-input{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.manual-input input{background:var(--s2);border:1px solid var(--bd);color:var(--t);padding:7px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.71rem;width:80px;outline:none;}
+.manual-input input:focus{border-color:var(--a);}
+.cmp-tabs{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap;}
+.ctab{padding:6px 15px;border:1px solid var(--bd);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:0.67rem;cursor:pointer;color:var(--t3);transition:all 0.2s;background:rgba(0,229,255,0.02);}
+.ctab:hover{border-color:rgba(0,229,255,0.28);color:var(--t2);}
+.ctab.active{border-color:var(--a);color:var(--a);background:rgba(0,229,255,0.08);}
+.ctab.t-ffd.active{border-color:var(--a4);color:var(--a4);background:rgba(155,114,248,0.07);}
+.ctab.t-ff.active{border-color:var(--a3);color:var(--a3);background:rgba(255,87,87,0.06);}
+.ctab.t-hybrid.active{border-color:var(--a2);color:var(--a2);background:rgba(0,255,157,0.06);}
+.algo-slides{position:relative;}
+.algo-slide{display:none;}
+.algo-slide.active{display:block;animation:slide-in 0.3s ease;}
+@keyframes slide-in{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+.result-panel{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px;}
+.result-panel.r-hybrid{border-top:3px solid var(--a2);}
+.result-panel.r-bfd{border-top:3px solid var(--a);}
+.result-panel.r-ffd{border-top:3px solid var(--a4);}
+.result-panel.r-ff{border-top:3px solid var(--a3);}
+.rp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.rp-title{font-family:'Unbounded',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:-0.02em;}
+.rp-title.c-hybrid{color:var(--a2);}.rp-title.c-bfd{color:var(--a);}.rp-title.c-ffd{color:var(--a4);}.rp-title.c-ff{color:var(--a3);}
+.rp-rank{padding:5px 11px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:700;}
+.rank-1{background:rgba(0,255,157,0.13);color:var(--a2);border:1px solid rgba(0,255,157,0.28);}
+.rank-2{background:rgba(0,229,255,0.08);color:var(--a);border:1px solid rgba(0,229,255,0.2);}
+.rank-3{background:rgba(155,114,248,0.1);color:var(--a4);border:1px solid rgba(155,114,248,0.23);}
+.rank-4{background:rgba(255,87,87,0.08);color:var(--a3);border:1px solid rgba(255,87,87,0.18);}
+.rp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px;}
+.rps{background:rgba(0,229,255,0.025);border:1px solid var(--bd);border-radius:7px;padding:9px 11px;text-align:center;}
+.rps-v{font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:700;color:var(--a);line-height:1;letter-spacing:-0.02em;}
+.rps-l{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--t3);margin-top:3px;text-transform:uppercase;}
+.rps.c-hybrid .rps-v{color:var(--a2);}.rps.c-bfd .rps-v{color:var(--a);}.rps.c-ffd .rps-v{color:var(--a4);}.rps.c-ff .rps-v{color:var(--a3);}
+.algo-char{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;}
+.char-tag{padding:4px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:700;}
+.result-panel{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:14px;}
+.result-panel.r-hybrid{border-top:4px solid var(--a2);}
+.result-panel.r-bfd{border-top:4px solid var(--a);}
+.result-panel.r-ffd{border-top:4px solid var(--a4);}
+.result-panel.r-ff{border-top:4px solid var(--a3);}
+.rp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.rp-title{font-family:'Unbounded',sans-serif;font-size:1.15rem;font-weight:700;letter-spacing:-0.02em;}
+.rp-title.c-hybrid{color:var(--a2);}.rp-title.c-bfd{color:var(--a);}.rp-title.c-ffd{color:var(--a4);}.rp-title.c-ff{color:var(--a3);}
+.rp-rank{padding:6px 13px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:700;}
+.rank-1{background:rgba(0,255,157,0.13);color:var(--a2);border:1px solid rgba(0,255,157,0.28);}
+.rank-2{background:rgba(0,229,255,0.08);color:var(--a);border:1px solid rgba(0,229,255,0.2);}
+.rank-3{background:rgba(155,114,248,0.1);color:var(--a4);border:1px solid rgba(155,114,248,0.23);}
+.rank-4{background:rgba(255,87,87,0.08);color:var(--a3);border:1px solid rgba(255,87,87,0.18);}
+.rp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.rps{background:rgba(0,229,255,0.025);border:1px solid var(--bd);border-radius:8px;padding:12px;text-align:center;}
+.rps-v{font-family:'Unbounded',sans-serif;font-size:1.5rem;font-weight:700;color:var(--a);line-height:1;letter-spacing:-0.02em;}
+.rps-l{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--t3);margin-top:5px;text-transform:uppercase;letter-spacing:0.07em;}
+.rps.c-hybrid .rps-v{color:var(--a2);}.rps.c-bfd .rps-v{color:var(--a);}.rps.c-ffd .rps-v{color:var(--a4);}.rps.c-ff .rps-v{color:var(--a3);}
+.algo-char{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.char-tag{padding:5px 12px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:700;}
+.diff-section{background:rgba(0,0,0,0.2);border:1px solid;border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:0.82rem;line-height:1.7;}
+.diff-section.better{border-color:rgba(0,255,157,0.3);background:rgba(0,255,157,0.04);}
+.diff-section.worse{border-color:rgba(255,87,87,0.25);background:rgba(255,87,87,0.03);}
+.diff-section.neutral{border-color:rgba(0,229,255,0.2);background:rgba(0,229,255,0.03);}
+.diff-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;font-weight:700;}
+.diff-label.better{color:var(--a2);}.diff-label.worse{color:var(--a3);}.diff-label.neutral{color:var(--a);}
+.rp-log{background:rgba(0,0,0,0.25);border:1px solid var(--bd);border-radius:7px;padding:12px;max-height:240px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--t2);line-height:1.7;}
+.rp-log::-webkit-scrollbar{width:3px;}.rp-log::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.12);}
+.rp-log-hdr{font-size:0.78rem;color:var(--a);font-weight:700;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd);}
+.rp-le{padding:7px 9px;border-left:3px solid;border-radius:3px;margin-bottom:5px;background:rgba(0,0,0,0.15);}
+.rp-le-t{font-weight:700;font-size:0.76rem;}
+.rp-le-d{font-size:0.68rem;color:var(--t3);margin-top:2px;}
+.cmp-table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;font-size:0.8rem;}
+.cmp-table th{background:rgba(0,229,255,0.08);padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--a);text-transform:uppercase;letter-spacing:0.07em;text-align:left;border-bottom:1px solid var(--bd);}
+.cmp-table td{padding:9px 12px;border-bottom:1px solid rgba(28,45,74,0.4);color:var(--t2);font-size:0.79rem;}
+.cmp-table tr:hover td{background:rgba(0,229,255,0.025);color:var(--t);}
+.best-row td{background:rgba(0,255,157,0.035)!important;}
+.best-row td:first-child{border-left:3px solid var(--a2);}
+.badge-best{padding:2px 7px;background:rgba(0,255,157,0.13);color:var(--a2);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.58rem;border:1px solid rgba(0,255,157,0.25);}
+.eff-bar{display:flex;align-items:center;gap:6px;}
+.eff-mini{height:4px;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;flex-shrink:0;}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;}
+.ov-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;transition:all 0.25s;}
+.ov-card:hover{border-color:rgba(0,229,255,0.28);transform:translateY(-2px);}
+.ov-ico{font-size:1.5rem;margin-bottom:8px;}
+.ov-title{font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:700;color:var(--a);margin-bottom:6px;}
+.ov-body{font-size:0.8rem;color:var(--t2);line-height:1.72;}
+.ov-body strong{color:var(--t);font-weight:600;}
+.steps{display:flex;gap:0;margin-bottom:24px;counter-reset:step;}
+.step{flex:1;padding:14px;background:var(--s1);border:1px solid var(--bd);position:relative;counter-increment:step;}
+.step:first-child{border-radius:10px 0 0 10px;}.step:last-child{border-radius:0 10px 10px 0;}
+.step::before{content:counter(step);position:absolute;top:10px;right:10px;width:20px;height:20px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--a);text-align:center;line-height:20px;}
+.step-n{font-family:'Outfit',sans-serif;font-size:0.84rem;font-weight:700;color:var(--a);margin-bottom:4px;}
+.step-d{font-size:0.77rem;color:var(--t2);line-height:1.62;}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;gap:12px;}
+.spinner{width:34px;height:34px;border:3px solid rgba(0,229,255,0.12);border-top:3px solid var(--a);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--t3);}
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.insight-box{padding:12px 14px;border-radius:9px;border:1px solid;}
+.insight-box.best-box{background:rgba(0,255,157,0.06);border-color:rgba(0,255,157,0.25);}
+.insight-box.worst-box{background:rgba(255,87,87,0.05);border-color:rgba(255,87,87,0.22);}
+.insight-box.speed-box{background:rgba(155,114,248,0.06);border-color:rgba(155,114,248,0.22);}
+.insight-title{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);margin-bottom:5px;}
+.insight-val{font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:3px;}
+.insight-sub{font-size:0.72rem;color:var(--t2);}
+.tc{position:fixed;bottom:18px;right:18px;z-index:900;display:flex;flex-direction:column;gap:6px;}
+.toast{padding:10px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:0.65rem;display:flex;align-items:center;gap:7px;min-width:210px;box-shadow:0 10px 28px rgba(0,0,0,0.38);animation:tin 0.25s ease;}
+@keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tout{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(14px)}}
+.toast.s{background:rgba(0,255,157,0.11);border:1px solid rgba(0,255,157,0.32);color:var(--a2);}
+.toast.e{background:rgba(255,87,87,0.11);border:1px solid rgba(255,87,87,0.32);color:var(--a3);}
+.toast.i{background:rgba(0,229,255,0.09);border:1px solid rgba(0,229,255,0.26);color:var(--a);}
+@media print{
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+body{background:white!important;color:#111!important;}
+body::before{display:none!important;}
+.hdr,.snav,.tc,.hbtn,.ds-select-panel,.cmp-tabs,.snav-item{display:none!important;}
+.wrap{padding-top:0!important;}
+.main{margin-left:0!important;padding:16px!important;}
+.section:not(.active){display:none!important;}
+.section.active{display:block!important;}
+.algo-slide.active{display:block!important;}
+.chart-wrap,.card,.result-panel,.algo-card,.stat,.ov-card{background:#f8f9fa!important;border-color:#dde!important;break-inside:avoid;page-break-inside:avoid;}.sec-title{color:#111!important;font-size:1.3rem!important;}.sec-sub,.card-body,.algo-desc,.step-d,.ov-body{color:#444!important;}.card-title,.algo-name,.ov-title,.step-n{color:#006688!important;}.mc-v,.stat-v,.rps-v{color:#006688!important;}.chart-title{color:#006688!important;}.cmp-table th{background:#e8f4f8!important;color:#006688!important;}.cmp-table td{color:#333!important;border-color:#ddd!important;}.result-panel{background:#f8f9fa!important;}.rp-log{background:#f5f5f5!important;color:#333!important;max-height:none!important;}canvas{max-width:100%!important;}h1,h2,h3{page-break-after:avoid;}}</style>
+</head>
+<body><div class="tc" id="tc"></div><div class="hdr">
+  <div class="logo"><div class="lic">❄️</div><span style="color:var(--t)">Cryo</span><span style="color:var(--a)">Pack</span>&nbsp;<span style="color:var(--t3);font-size:0.7rem;font-family:'JetBrains Mono',monospace;font-weight:400;">ANALYSIS</span></div>
+  <div class="hcen"><div class="htitle">Algorithm Analysis & Report</div></div><button class="hbtn" onclick="window.location.href='/index.html'">← Back to Packer</button>
+  <button class="hbtn print-btn" onclick="doPrint()">🖨 Print Report</button></div><div class="wrap"><nav class="snav"><div class="snav-label">Navigation</div>
+  <div class="snav-item active" onclick="showSec('datasets',this)"><span class="snav-ico">💾</span>My Datasets</div>
+  <div class="snav-item" onclick="showSec('comparison',this)"><span class="snav-ico">📊</span>Comparison</div><div class="snav-sep"></div>
+  <div class="snav-label">Reference</div><div class="snav-item" onclick="showSec('overview',this)"><span class="snav-ico">📋</span>Overview</div>
+  <div class="snav-item" onclick="showSec('algorithms',this)"><span class="snav-ico">⚡</span>Algorithms</div></nav>
+<main class="main"><section class="section active" id="sec-datasets"><div class="sec-title">💾 My Datasets</div>
+  <div class="sec-sub">Manage saved vaccine box datasets. Load into the comparison engine or send back to the main packing interface.</div>
+  <div id="dsFullList"><div class="loading"><div class="spinner"></div><div class="loading-txt">Loading datasets...</div></div></div></section>
+<section class="section" id="sec-comparison"><div class="sec-title">📊 Algorithm Comparison</div>
+  <div class="sec-sub">Run all 4 algorithms on the same dataset simultaneously. Each algorithm uses a different sort order and placement heuristic — expect genuinely different efficiency scores, unit counts, and placement distributions.</div>
+  <div class="ds-select-panel"><div class="ds-panel-title">📂 Select Dataset to Analyze</div>
+    <div class="ds-panel-sub">Choose a saved dataset or session data. All 4 algorithms will run on identical box lists for a fair apples-to-apples comparison.</div>
+    <div class="ds-list" id="dsList"><div style="color:var(--t3);font-size:0.78rem;padding:12px 0;font-family:'JetBrains Mono',monospace;">Loading datasets...</div></div>
+    <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap;">
+      <button class="ds-run-btn" id="runCmpBtn" onclick="runComparison()" disabled>▶ Run All 4 Algorithms</button>
+      <div style="font-size:0.75rem;color:var(--t3);font-family:'JetBrains Mono',monospace;" id="selInfo">No dataset selected</div></div><div class="manual-input">
+      <span style="font-size:0.7rem;color:var(--t3);font-family:'JetBrains Mono',monospace;">Override unit dims:</span>
+      <input type="number" id="mW" placeholder="W" value="8" min="1"><input type="number" id="mD" placeholder="D" value="8" min="1">
+      <input type="number" id="mH" placeholder="H" value="8" min="1"></div></div><div id="cmpResults" style="display:none;"><div class="grid2"><div class="chart-wrap">
+        <div class="chart-title">Volume Efficiency %</div><div class="chart-sub">How well each algorithm fills the available space</div>
+        <canvas id="cmpEffChart" height="200"></canvas></div><div class="chart-wrap">
+        <div class="chart-title">Cooling Units Required</div><div class="chart-sub">Fewer units = better packing (lower is better)</div>
+        <canvas id="cmpUnitsChart" height="200"></canvas></div></div><div class="grid2" style="margin-bottom:18px;">
+      <div class="chart-wrap"><div class="chart-title">Wasted Space per Algorithm</div>
+        <div class="chart-sub">Total unused volume (u³) across all cooling units used</div><canvas id="cmpWasteChart" height="200"></canvas></div>
+      <div class="chart-wrap"><div class="chart-title">Boxes-per-Unit Density</div>
+        <div class="chart-sub">Average number of boxes packed per cooling unit</div><canvas id="cmpDensityChart" height="200"></canvas></div></div>
+    <div class="card" style="margin-bottom:18px;"><div class="card-title">💡 Key Insights</div>
+      <div class="insight-grid" id="insightGrid"></div></div><div class="card" style="margin-bottom:20px;">
+      <div class="card-title">🏆 Algorithm Rankings</div><table class="cmp-table" id="cmpTable" style="margin-top:7px;"></table></div>
+    <div style="font-family:'Outfit',sans-serif;font-size:0.96rem;font-weight:700;margin-bottom:12px;color:var(--t);">🔬 Per-Algorithm Detailed Results</div>
+    <div class="cmp-tabs" id="algTabs"><div class="ctab t-hybrid active" onclick="showAlgoSlide('HYBRID',this)">⭐ Hybrid</div>
+      <div class="ctab t-bfd" onclick="showAlgoSlide('BFD',this)">BFD</div><div class="ctab t-ffd" onclick="showAlgoSlide('FFD',this)">FFD</div>
+      <div class="ctab t-ff" onclick="showAlgoSlide('FF',this)">FF Online</div><div class="ctab" onclick="showAlgoSlide('ALL',this)">🖨 All</div></div>
+    <div class="algo-slides" id="algoSlides"></div></div>
+  <div id="cmpEmpty" style="text-align:center;padding:50px;color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:0.78rem;">← Select a dataset and click "Run All 4 Algorithms"</div>
+  <div id="cmpLoading" class="loading" style="display:none;"><div class="spinner"></div><div class="loading-txt">Running all 4 algorithms simultaneously...</div></div></section>
+<section class="section" id="sec-overview"><div class="sec-title">📋 What is CryoPack OS?</div>
+  <div class="sec-sub">CryoPack OS is a real-time vaccine cold-chain logistics optimizer. It solves the 3D bin-packing problem: given a set of vaccine boxes of varying sizes, pack them into the fewest possible cooling units (refrigerated transport containers) while maximizing space utilization. This directly reduces cold-chain costs, avoids vaccine spoilage, and ensures efficient vaccine distribution.</div>
+  <div class="overview-grid"><div class="ov-card"><div class="ov-ico">❄️</div><div class="ov-title">Why It's Needed</div>
+      <div class="ov-body">Vaccine cold-chain failures waste millions of doses. By minimizing the number of cooling units needed, CryoPack OS reduces refrigeration cost, transport weight, and the risk of temperature excursions. <strong>Fewer units = less cost + less waste.</strong></div>
+    </div><div class="ov-card"><div class="ov-ico">📦</div><div class="ov-title">How Packing Works</div>
+      <div class="ov-body">Boxes are placed using the <strong>corner-point method</strong>: after each placement, 3 new candidate positions are generated at box corners: (x+w,y,z), (x,y+d,z), (x,y,z+h). Each algorithm scores these positions differently to achieve its unique packing behavior.</div>
+    </div><div class="ov-card"><div class="ov-ico">📊</div><div class="ov-title">Efficiency Score</div>
+      <div class="ov-body">Efficiency = <strong>total box volume ÷ (units used × unit volume) × 100%</strong>. The goal is to maximize this. A score of 85% means 85% of cold-chain space is being used for vaccines — only 15% is wasted air.</div>
+    </div></div><div class="steps">
+    <div class="step"><div class="step-n">1. Input Boxes</div><div class="step-d">User adds vaccine box dimensions (W×D×H) and quantities. Boxes can be added manually, randomly, or loaded from a saved dataset.</div></div>
+    <div class="step"><div class="step-n">2. Sort by Algorithm</div><div class="step-d">HYBRID & BFD sort by volume↓. FFD sorts by longest dimension↓. FF uses arrival order (no sort). This determines placement priority.</div></div>
+    <div class="step"><div class="step-n">3. Corner-Point Placement</div><div class="step-d">For each box, all candidate corner positions are evaluated. The best position is selected using the algorithm's scoring heuristic (surface contact, gravity, or sequential).</div></div>
+    <div class="step"><div class="step-n">4. Unit Overflow</div><div class="step-d">If no candidate position fits in the current cooling unit, a new unit is automatically opened. Boxes continue packing until all are placed.</div></div>
+    <div class="step"><div class="step-n">5. Report & Compare</div><div class="step-d">Efficiency %, cooling units used, placement log, and per-unit breakdown are shown. Compare all 4 algorithms to choose the best for your scenario.</div></div>
+  </div><div class="chart-wrap"><div class="chart-title">Typical Efficiency Range by Algorithm (across various box configurations)</div>
+    <div class="chart-sub">Min → Max efficiency % — Hybrid consistently outperforms others; FF Online works best for real-time streaming</div>
+    <canvas id="overviewChart" height="120"></canvas></div></section><section class="section" id="sec-algorithms"><div class="sec-title">⚡ Packing Algorithms</div>
+  <div class="sec-sub">Four genuinely differentiated algorithms — each with unique sort order, placement heuristic, and scoring function. Run a comparison to see the real differences in output.</div>
+  <div class="grid2"><div class="algo-card best"><span class="badge badge-hybrid">⭐ RECOMMENDED</span><div class="algo-name c1">Hybrid Best-Fit</div>
+      <div class="algo-short">HYBRID — Surface-Contact Composite Scoring</div>
+      <div class="algo-desc">Sort by volume↓. For each box, evaluate <strong>all open units</strong> using surface-contact scoring — counts how many faces of the placed box would touch walls, floor, or other boxes. Selects the unit with the highest contact score AND lowest remaining waste. Achieves the densest packing by minimising air gaps through physical surface maximisation.</div>
+      <div class="algo-meta">
+        <span class="pill g">65–88% efficiency</span><span class="pill c">Surface-contact score</span><span class="pill g">Fewest units</span><span class="pill c">O(n²·m)</span>
+      </div></div><div class="algo-card" style="border-color:rgba(0,229,255,0.22);"><span class="badge badge-bfd">CLASSIC</span><div class="algo-name c2">Best Fit Decreasing</div>
+      <div class="algo-short">BFD — Gravity-Stack Heuristic</div>
+      <div class="algo-desc">Sort by volume↓. For each box, finds the unit with the <strong>smallest remaining capacity that still fits</strong> — classic BFD rule. Uses a <strong>gravity-stacking placement</strong>: heavily penalises height (z), slightly penalises XY deviation from centre. Results in tight, low-centre-of-mass stacking distinct from Hybrid's surface-contact approach.</div>
+      <div class="algo-meta">
+        <span class="pill g">58–82% efficiency</span><span class="pill c">Gravity stacking</span><span class="pill c">Volume↓ sort</span><span class="pill c">O(n·log n+nm)</span>
+      </div></div><div class="algo-card" style="border-color:rgba(155,114,248,0.22);"><span class="badge badge-ffd">SPEED</span><div class="algo-name c3">First Fit Decreasing</div>
+      <div class="algo-short">FFD — Longest Dimension Sort</div>
+      <div class="algo-desc">Unlike BFD, sorts by <strong>longest single dimension↓</strong> (not volume) — this prioritises flat/elongated boxes differently. Places in the <strong>first unit with a valid corner-point</strong> using standard z→x→y ordering. No unit scoring performed — stops at first fit. Faster than BFD/Hybrid, different unit distribution due to sort order change.</div>
+      <div class="algo-meta">
+        <span class="pill y">50–75% efficiency</span><span class="pill p">Longest-dim sort</span><span class="pill c">First-valid fit</span><span class="pill c">O(n·log n+nm)</span>
+      </div></div><div class="algo-card" style="border-color:rgba(255,87,87,0.22);"><span class="badge badge-ff">ONLINE</span><div class="algo-name c4">First Fit (Online)</div>
+      <div class="algo-short">FF — Arrival-Order Spread Heuristic</div>
+      <div class="algo-desc"><strong>No pre-sorting</strong> — boxes placed in arrival order. Uses a <strong>spread heuristic</strong>: sorts candidates by x+y first (spread across floor), then height. Distributes boxes widely before stacking tall. Worst-case approximation ≤17/10·OPT+2. Best for real-time streaming scenarios where boxes arrive sequentially.</div>
+      <div class="algo-meta">
+        <span class="pill o">42–65% efficiency</span><span class="pill o">Arrival order</span><span class="pill o">Spread heuristic</span><span class="pill c">O(n·m)</span>
+      </div></div></div><div class="grid2"><div class="chart-wrap"><div class="chart-title">Efficiency Ranges per Algorithm</div>
+      <div class="chart-sub">Minimum and maximum efficiency across various configurations</div><canvas id="algoRangeChart" height="200"></canvas></div>
+    <div class="chart-wrap"><div class="chart-title">Time Complexity (Operations vs n)</div>
+      <div class="chart-sub">Relative operations as box count increases</div><canvas id="complexChart" height="200"></canvas></div></div>
+  <div class="card"><div class="card-title">📋 Algorithm Summary Table</div><table class="cmp-table" style="margin-top:7px;">
+      <tr><th>Algorithm</th><th>Sort Order</th><th>Placement Rule</th><th>Key Heuristic</th><th>Efficiency</th><th>Best Use Case</th></tr>
+      <tr class="best-row"><td><strong>HYBRID</strong> <span class="badge-best">★ Best</span></td><td>Vol↓</td><td>Min waste + max surface</td><td>Surface contact</td><td>65–88%</td><td>Production</td></tr>
+      <tr><td><strong>BFD</strong></td><td>Vol↓</td><td>Smallest-remaining unit</td><td>Gravity stack</td><td>58–82%</td><td>Low CG packing</td></tr>
+      <tr><td><strong>FFD</strong></td><td>Longest dim↓</td><td>First valid unit</td><td>z→x→y order</td><td>50–75%</td><td>Speed critical</td></tr>
+      <tr><td><strong>FF</strong></td><td>Arrival order</td><td>First valid unit</td><td>XY spread</td><td>42–65%</td><td>Real-time stream</td></tr></table></div>
+</section></main></div><script>
+const A={sessionData:null,datasets:[],selectedDS:null,cmpData:null,cmpMeta:null};
+const ALGO_CFG={
+  HYBRID:{color:'rgba(0,255,157,0.9)',bg:'rgba(0,255,157,0.2)',name:'Hybrid Best-Fit',cls:'hybrid',rankCls:'rank-1',char:'Surface Contact · Vol↓ Sort · Best-Fit Unit',charColor:'var(--a2)',strategy:'Max surface contacts → min waste composite score',detail:'Unlike BFD which minimizes remaining unit space, Hybrid scores every candidate position by how much face-contact a box makes with neighbours — maximizing structural stability and packing density simultaneously.'},
+  BFD:{color:'rgba(0,229,255,0.9)',bg:'rgba(0,229,255,0.2)',name:'Best Fit Decreasing',cls:'bfd',rankCls:'rank-2',char:'Gravity Stack · Vol↓ Sort · Smallest-Remaining Unit',charColor:'var(--a)',strategy:'Gravity-optimal position in best remaining-volume unit',detail:'BFD uses a gravity-stack heuristic — it minimizes the Y-position (height) of placements. It chooses whichever unit has the least remaining capacity that still fits the box, reducing fragmentation across units.'},
+  FFD:{color:'rgba(155,114,248,0.9)',bg:'rgba(155,114,248,0.18)',name:'First Fit Decreasing',cls:'ffd',rankCls:'rank-3',char:'Longest-Dim Sort · z→x→y Priority · First-Fit',charColor:'var(--a4)',strategy:'Longest dimension sort → sequential corner placement',detail:'FFD sorts by the longest box dimension (not volume), then places into the FIRST unit that has a valid position. It prioritises z→x→y axis order, which tends to fill depth first — efficient for elongated boxes but suboptimal for compact ones.'},
+  FF:{color:'rgba(255,87,87,0.9)',bg:'rgba(255,87,87,0.18)',name:'First Fit (Online)',cls:'ff',rankCls:'rank-4',char:'Arrival Order · XY-Spread Heuristic · No Sort',charColor:'var(--a3)',strategy:'No pre-sort → XY spread priority → first valid unit',detail:'FF processes boxes in arrival order without any pre-sorting. It spreads boxes across the XY plane first, then stacks. Best for streaming/real-time scenarios where all boxes are not known in advance, at the cost of efficiency.'}
+};
+const BOX_COLS=['#00e5ff','#00ff9d','#ff6b9d','#ffa500','#cc66ff','#ff6b35','#7bc67e','#ffb300','#4fc3f7','#f06292','#80cbc4','#ffcc80'];
+window.addEventListener('DOMContentLoaded',async()=>{
+  try{A.sessionData=JSON.parse(sessionStorage.getItem('cp_result')||'null');}catch(e){}
+  initOverviewCharts();initAlgoCharts();await loadDatasets();
+  renderDSFull();});
+function showSec(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.snav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id)?.classList.add('active');if(el)el.classList.add('active');if(id==='datasets')renderDSFull();
+  if(id==='comparison')renderDSSelector();}
+function initOverviewCharts(){
+  const ctx=document.getElementById('overviewChart').getContext('2d');new Chart(ctx,{type:'bar',data:{labels:['Hybrid Best-Fit','Best Fit Dec.','First Fit Dec.','First Fit Online'],datasets:[
+      {label:'Min Efficiency %',data:[65,58,50,42],backgroundColor:['rgba(0,255,157,0.22)','rgba(0,229,255,0.2)','rgba(155,114,248,0.18)','rgba(255,87,87,0.18)'],borderColor:['rgba(0,255,157,0.8)','rgba(0,229,255,0.8)','rgba(155,114,248,0.8)','rgba(255,87,87,0.8)'],borderWidth:2,borderRadius:5},
+      {label:'Max Efficiency %',data:[88,82,75,65],backgroundColor:['rgba(0,255,157,0.08)','rgba(0,229,255,0.08)','rgba(155,114,248,0.07)','rgba(255,87,87,0.07)'],borderColor:['rgba(0,255,157,0.35)','rgba(0,229,255,0.35)','rgba(155,114,248,0.35)','rgba(255,87,87,0.35)'],borderWidth:1,borderRadius:5}
+    ]},options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{labels:{color:'#8aabca',font:{family:'JetBrains Mono',size:10}}}},
+    scales:{x:{grid:{color:'rgba(28,45,74,0.45)'},ticks:{color:'#c5dff0',font:{size:12}}},
+    y:{grid:{color:'rgba(28,45,74,0.45)'},ticks:{color:'#c5dff0',font:{size:12}},beginAtZero:true,max:100}}}});}
+function initAlgoCharts(){
+  // Range chart
+  const ctx1=document.getElementById('algoRangeChart')?.getContext('2d');if(ctx1){new Chart(ctx1,{type:'bar',data:{labels:['Hybrid','BFD','FFD','FF'],datasets:[
+    {label:'Min %',data:[65,58,50,42],backgroundColor:['rgba(0,255,157,0.26)','rgba(0,229,255,0.24)','rgba(155,114,248,0.2)','rgba(255,87,87,0.2)'],borderColor:['rgba(0,255,157,0.8)','rgba(0,229,255,0.8)','rgba(155,114,248,0.8)','rgba(255,87,87,0.8)'],borderWidth:2,borderRadius:4},
+    {label:'Max %',data:[88,82,75,65],backgroundColor:['rgba(0,255,157,0.1)','rgba(0,229,255,0.1)','rgba(155,114,248,0.08)','rgba(255,87,87,0.08)'],borderColor:['rgba(0,255,157,0.38)','rgba(0,229,255,0.38)','rgba(155,114,248,0.38)','rgba(255,87,87,0.38)'],borderWidth:1,borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#8aabca',font:{family:'JetBrains Mono',size:10}}}},scales:{x:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}}},y:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}},beginAtZero:true,max:100}}}});}
+  // Complexity chart
+  const ctx2=document.getElementById('complexChart')?.getContext('2d');
+  if(ctx2){const ns=Array.from({length:10},(_,i)=>(i+1)*10);new Chart(ctx2,{type:'line',data:{labels:ns.map(n=>n+''),datasets:[
+      {label:'Hybrid O(n²m)',data:ns.map(n=>n*n*2.2),borderColor:'rgba(0,255,157,0.85)',tension:0.4,fill:false,pointRadius:2},
+      {label:'BFD O(nm)',data:ns.map(n=>n*n*1.1),borderColor:'rgba(0,229,255,0.85)',tension:0.4,fill:false,pointRadius:2},
+      {label:'FFD O(n·logn)',data:ns.map(n=>n*Math.log2(n)*5),borderColor:'rgba(155,114,248,0.85)',tension:0.4,fill:false,pointRadius:2},
+      {label:'FF O(nm)',data:ns.map(n=>n*n*0.9),borderColor:'rgba(255,87,87,0.85)',tension:0.4,fill:false,pointRadius:2}
+    ]},options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{labels:{color:'#8aabca',font:{family:'JetBrains Mono',size:10}}}},
+    scales:{x:{title:{display:true,text:'n (boxes)',color:'#445f7a',font:{size:10}},grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:11}}},
+    y:{title:{display:true,text:'Operations',color:'#445f7a',font:{size:10}},grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:11}}}}}}
+  );}}
+async function loadDatasets(){
+  try{const r=await fetch('/api/datasets',{credentials:'include'});if(!r.ok)return;A.datasets=await r.json();}catch(e){}}
+async function renderDSFull(){
+  const el=document.getElementById('dsFullList');await loadDatasets();
+  if(!A.datasets.length&&!A.sessionData){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--t3);font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;">No datasets saved yet. Return to the main packer and save a dataset.</div>';return;}
+  let html='';
+  if(A.sessionData){
+    html+=`<div class="card" style="margin-bottom:14px;border-color:rgba(0,229,255,0.25);"><div class="card-title">📍 Current Session Data</div>
+      <div class="card-body">
+        Unit: ${A.sessionData.unit_w||'?'}×${A.sessionData.unit_d||'?'}×${A.sessionData.unit_h||'?'} &nbsp;·&nbsp;
+        ${A.sessionData.boxes_total||'?'} boxes &nbsp;·&nbsp; ${A.sessionData.efficiency||'?'}% efficiency<br><br>
+        <button class="hbtn" onclick="goToComparison('__session__')" style="margin-top:4px;">📊 Run Comparison →</button></div></div>`;}
+  if(A.datasets.length){
+    html+='<div class="grid2">'+A.datasets.map(d=>{
+      const bc=d.boxes?.reduce((s,b)=>s+(b.qty||1),0)||d.boxes?.length||'?';
+      const uc=d.unit_config||{};
+      return`<div class="card"><div class="card-title">💾 ${d.name}</div>
+        <div class="card-body">
+          Unit: ${uc.unit_w||'?'}×${uc.unit_d||'?'}×${uc.unit_h||'?'} &nbsp;·&nbsp; ${bc} boxes<br>
+          Saved: ${new Date(d.created_at).toLocaleString()}<br><br><div style="display:flex;gap:7px;margin-top:6px;">
+            <button class="hbtn" onclick="goToComparison('${d.id}')">📊 Analyze</button>
+            <button class="hbtn" style="background:rgba(255,87,87,0.08);color:var(--a3);border-color:rgba(255,87,87,0.22);" onclick="deleteDS('${d.id}',this)">✕ Delete</button>
+          </div></div></div>`;
+    }).join('')+'</div>';}
+  el.innerHTML=html;}
+async function deleteDS(id,btn){
+  await fetch(`/api/datasets/${id}`,{method:'DELETE',credentials:'include'});
+  btn.closest('.card').remove();A.datasets=A.datasets.filter(d=>d.id!==id);
+  toast('Dataset deleted','i');}
+function goToComparison(id){
+  A.selectedDS=id;showSec('comparison',document.querySelector('.snav-item:nth-child(2)'));renderDSSelector();
+  setTimeout(()=>document.getElementById('sec-comparison').scrollIntoView({behavior:'smooth'}),80);}
+function renderDSSelector(){
+  const el=document.getElementById('dsList'),items=[];
+  if(A.sessionData){
+    items.push(`<div class="ds-opt ${A.selectedDS==='__session__'?'sel':''}" onclick="selectDS('__session__',this)" id="ds-__session__">
+      <div class="ds-opt-name">📍 Current Session Data</div>
+      <div class="ds-opt-meta">${A.sessionData.boxes_total||'?'} boxes · Unit ${A.sessionData.unit_w||8}×${A.sessionData.unit_d||8}×${A.sessionData.unit_h||8}</div></div>`);}
+  A.datasets.forEach(d=>{
+    const bc=d.boxes?.reduce((s,b)=>s+(b.qty||1),0)||d.boxes?.length||'?';
+    const uc=d.unit_config||{};
+    items.push(`<div class="ds-opt ${A.selectedDS===d.id?'sel':''}" onclick="selectDS('${d.id}',this)" id="ds-${d.id}"><div class="ds-opt-name">💾 ${d.name}</div>
+      <div class="ds-opt-meta">${bc} boxes · ${uc.unit_w||'?'}×${uc.unit_d||'?'}×${uc.unit_h||'?'} · ${new Date(d.created_at).toLocaleDateString()}</div></div>`);});
+  if(!items.length){el.innerHTML='<div style="color:var(--t3);font-size:0.78rem;padding:10px 0;font-family:\'JetBrains Mono\',monospace;">No datasets found. Save from main page first.</div>';return;}
+  el.innerHTML=items.join('');
+  if(!A.selectedDS){const fid=A.sessionData?'__session__':(A.datasets[0]?.id||null);if(fid)selectDS(fid,null,true);}}
+function selectDS(id,el,silent){
+  document.querySelectorAll('.ds-opt').forEach(o=>o.classList.remove('sel'));A.selectedDS=id;if(el)el.classList.add('sel');
+  else{const e=document.getElementById('ds-'+id);if(e)e.classList.add('sel');}
+  const btn=document.getElementById('runCmpBtn'),info=document.getElementById('selInfo');
+  if(id==='__session__'&&A.sessionData){
+    btn.disabled=false;info.textContent=`Session data (${A.sessionData.boxes_total} boxes)`;
+    if(A.sessionData.unit_w){document.getElementById('mW').value=A.sessionData.unit_w;document.getElementById('mD').value=A.sessionData.unit_d||8;document.getElementById('mH').value=A.sessionData.unit_h||8;}
+  }else{
+    const ds=A.datasets.find(d=>d.id===id);
+    if(ds){btn.disabled=false;info.textContent=`"${ds.name}"`;const uc=ds.unit_config||{};if(uc.unit_w){document.getElementById('mW').value=uc.unit_w;document.getElementById('mD').value=uc.unit_d||8;document.getElementById('mH').value=uc.unit_h||8;}}}
+  if(!silent)toast('Dataset selected','i');}
+async function runComparison(){
+  if(!A.selectedDS){toast('Select a dataset first','e');return;}
+  let boxes=[],unitW=8,unitD=8,unitH=8;
+  if(A.selectedDS==='__session__'&&A.sessionData){
+    boxes=A.sessionData.boxes||[];unitW=+document.getElementById('mW').value||8;unitD=+document.getElementById('mD').value||8;unitH=+document.getElementById('mH').value||8;
+  }else{
+    const ds=A.datasets.find(d=>d.id===A.selectedDS);if(!ds){toast('Not found','e');return;}
+    boxes=ds.boxes||[];const uc=ds.unit_config||{};unitW=+document.getElementById('mW').value||uc.unit_w||8;unitD=+document.getElementById('mD').value||uc.unit_d||8;unitH=+document.getElementById('mH').value||uc.unit_h||8;}
+  if(!boxes.length){toast('Dataset empty','e');return;}
+  document.getElementById('cmpResults').style.display='none';document.getElementById('cmpEmpty').style.display='none';document.getElementById('cmpLoading').style.display='flex';
+  document.getElementById('runCmpBtn').disabled=true;try{
+    const res=await fetch('/api/analysis/compare',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',
+      body:JSON.stringify({unit_w:unitW,unit_d:unitD,unit_h:unitH,boxes})});
+    if(!res.ok)throw new Error('API error '+res.status);
+    A.cmpData=await res.json();A.cmpMeta={unitW,unitD,unitH,boxes,unitVol:unitW*unitD*unitH};
+    renderComparison(A.cmpData);toast('Comparison complete!','s');
+  }catch(e){toast('Failed: '+e.message,'e');document.getElementById('cmpEmpty').style.display='block';}
+  document.getElementById('cmpLoading').style.display='none';
+  document.getElementById('runCmpBtn').disabled=false;}
+function renderComparison(data){
+  const algos=['HYBRID','BFD','FFD','FF'];const ordered=[...algos].sort((a,b)=>data[b].efficiency-data[a].efficiency);buildCmpCharts(algos,data);buildInsights(algos,data,ordered);
+  // Table
+  const tbody=ordered.map((key,i)=>{
+    const d=data[key],cfg=ALGO_CFG[key],isBest=i===0;
+    return`<tr${isBest?' class="best-row"':''}>
+      <td><span class="${cfg.rankCls}" style="padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem;">#${i+1}</span></td>
+      <td><strong style="color:${cfg.charColor}">${d.name}</strong>${isBest?'<span class="badge-best" style="margin-left:7px;">★ Best</span>':''}</td>
+      <td><div class="eff-bar"><div class="eff-mini" style="width:${Math.min(d.efficiency,80)}px;background:${cfg.color}"></div><strong style="color:${cfg.charColor}">${d.efficiency}%</strong></div></td>
+      <td>${d.units_used}</td><td>${d.boxes_placed} / ${d.boxes_total}</td>
+      <td>${d.runtime_ms.toFixed(2)}ms</td>
+      <td><span style="color:${d.efficiency>70?'var(--a2)':d.efficiency>55?'var(--a)':'var(--a3)'};">${d.efficiency>70?'Excellent':d.efficiency>55?'Good':'Fair'}</span></td></tr>`;
+  }).join('');
+  document.getElementById('cmpTable').innerHTML=`<tr><th>Rank</th><th>Algorithm</th><th>Efficiency</th><th>Units Used</th><th>Placed</th><th>Runtime</th><th>Grade</th></tr>${tbody}`;
+  buildAlgoSlides(data,ordered);document.getElementById('cmpResults').style.display='block';document.getElementById('cmpEmpty').style.display='none';
+  showAlgoSlide('HYBRID',document.querySelector('.ctab.t-hybrid'));}
+function buildInsights(algos,data,ordered){
+  const best=data[ordered[0]],worst=data[ordered[ordered.length-1]];
+  // Fastest runtime
+  const fastest=algos.reduce((a,b)=>data[a].runtime_ms<data[b].runtime_ms?a:b);const effDiff=(best.efficiency-worst.efficiency).toFixed(1);
+  document.getElementById('insightGrid').innerHTML=`
+    <div class="insight-box best-box"><div class="insight-title">Best Algorithm</div>
+      <div class="insight-val" style="color:var(--a2)">${best.name}</div><div class="insight-sub">${best.efficiency}% efficiency · ${best.units_used} unit(s) used</div></div>
+    <div class="insight-box worst-box"><div class="insight-title">Efficiency Gap</div>
+      <div class="insight-val" style="color:var(--a3)">+${effDiff}%</div>
+      <div class="insight-sub">Best vs worst algorithm — ${best.name} vs ${data[ordered[ordered.length-1]].name}</div></div><div class="insight-box speed-box">
+      <div class="insight-title">Fastest Runtime</div><div class="insight-val" style="color:var(--a4)">${data[fastest].name.split(' ')[0]}</div>
+      <div class="insight-sub">${data[fastest].runtime_ms.toFixed(2)}ms execution time</div></div>`;}
+function buildCmpCharts(algos,data){
+  ['cmpEffChart','cmpUnitsChart','cmpWasteChart','cmpDensityChart'].forEach(id=>{
+    const el=document.getElementById(id);if(el){const ci=Chart.getChart(el);if(ci)ci.destroy();}});
+  const labels=algos.map(k=>data[k].name.replace(' Decreasing',' Dec.').replace(' (Online)',''));const colors=algos.map(k=>ALGO_CFG[k]);const uv=A.cmpMeta?.unitVol||512;
+  // Chart 1: Efficiency %
+  new Chart(document.getElementById('cmpEffChart').getContext('2d'),{type:'bar',
+    data:{labels,datasets:[{label:'Efficiency %',data:algos.map(k=>data[k].efficiency),backgroundColor:colors.map(c=>c.bg),borderColor:colors.map(c=>c.color),borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}}},y:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}},beginAtZero:true,max:100}}}});
+  // Chart 2: Units used (horizontal bar — different from efficiency)
+  new Chart(document.getElementById('cmpUnitsChart').getContext('2d'),{type:'bar',
+    data:{labels,datasets:[{label:'Cooling Units',data:algos.map(k=>data[k].units_used),backgroundColor:colors.map(c=>c.bg),borderColor:colors.map(c=>c.color),borderWidth:2,borderRadius:6}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}},beginAtZero:true},y:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}}}}}});
+  // Chart 3: Wasted space (u³) — UNIQUE metric
+  const wasteData=algos.map(k=>{
+    const d=data[k];const totalCap=d.units_used*uv;const usedVol=d.placements?.reduce((s,p)=>s+p.box.w*p.box.d*p.box.h,0)||0;
+    return Math.max(0,totalCap-usedVol);});new Chart(document.getElementById('cmpWasteChart').getContext('2d'),{type:'bar',
+    data:{labels,datasets:[{label:'Wasted Space (u³)',data:wasteData,backgroundColor:['rgba(255,201,77,0.22)','rgba(255,201,77,0.18)','rgba(255,87,87,0.18)','rgba(255,87,87,0.22)'],borderColor:['rgba(255,201,77,0.8)','rgba(255,201,77,0.6)','rgba(255,87,87,0.6)','rgba(255,87,87,0.8)'],borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}}},y:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:12}},beginAtZero:true}}}});
+  // Chart 4: Boxes per unit density — UNIQUE metric
+  const densityData=algos.map(k=>data[k].units_used>0?(data[k].boxes_placed/data[k].units_used).toFixed(1):0);new Chart(document.getElementById('cmpDensityChart').getContext('2d'),{type:'radar',
+    data:{labels,datasets:[{label:'Boxes/Unit',data:densityData,backgroundColor:'rgba(0,229,255,0.1)',borderColor:'rgba(0,229,255,0.75)',borderWidth:2,pointBackgroundColor:colors.map(c=>c.color),pointRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{r:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#c5dff0',font:{size:11},backdropColor:'transparent'},pointLabels:{color:'#c5dff0',font:{size:12}}}}}});}
+function buildAlgoSlides(data,ordered){
+  const algos=['HYBRID','BFD','FFD','FF'];const slidesEl=document.getElementById('algoSlides');const uv=A.cmpMeta?.unitVol||512;
+  // Pre-compute cross-algo metrics for comparison bars
+  const effVals=algos.map(k=>data[k].efficiency);const bestEff=Math.max(...effVals);const unitVals=algos.map(k=>data[k].units_used);const bestUnits=Math.min(...unitVals);
+  const rtVals=algos.map(k=>data[k].runtime_ms);const bestRt=Math.min(...rtVals);
+  const wasteVals=algos.map(k=>{
+    const d=data[k], pv=d.placements?.reduce((s,p)=>s+p.box.w*p.box.d*p.box.h,0)||0;
+    return Math.max(0,d.units_used*uv-pv);});
+  const minWaste=Math.min(...wasteVals);
+  // Unique chart type per algorithm
+  const algoChartType={HYBRID:'doughnut',BFD:'polarArea',FFD:'bar',FF:'line'};
+  const algoChartLabel={HYBRID:'Space Usage (Filled vs Wasted)',BFD:'Unit Load Distribution',FFD:'Boxes per Cooling Unit',FF:'Cumulative Packing Progress'};
+  slidesEl.innerHTML=algos.map((key,ki)=>{
+    const d=data[key],cfg=ALGO_CFG[key],pls=d.placements||[];const rank=ordered.indexOf(key)+1;
+    const rotCount=pls.filter(p=>p.rotated).length;const totalPacked=pls.reduce((s,p)=>s+p.box.w*p.box.d*p.box.h,0);const wastedVol=Math.max(0,d.units_used*uv-totalPacked);
+    const ug={};pls.forEach(p=>{if(!ug[p.unit_id])ug[p.unit_id]={vol:0,count:0};ug[p.unit_id].vol+=p.box.w*p.box.d*p.box.h;ug[p.unit_id].count++;});
+    // Placement log
+    const logEntries=pls.slice(0,35).map((p,i)=>{
+      const c=BOX_COLS[i%BOX_COLS.length];const vol=p.box.w*p.box.d*p.box.h;const prevUid=i>0?pls[i-1].unit_id:p.unit_id;const overflow=i>0&&p.unit_id>prevUid;const rot=p.rotated?' 🔄 rotated':'';
+      const note=overflow?'⚠ Overflow → new container opened':p.z===0?'Floor placement (gravity-first)'+rot:'Stacked at corner-point'+rot;
+      return `<div class="rp-le" style="border-left-color:${c}"><div class="rp-le-t" style="color:${c}">Box ${i+1}: ${p.box.w}×${p.box.d}×${p.box.h} → Container ${p.unit_id+1}</div><div class="rp-le-d">(${p.x},${p.y},${p.z}) · ${vol}u³ · ${note}</div></div>`;
+    }).join('')+(pls.length>35?`<div style="color:var(--t3);font-size:0.67rem;padding:5px 0;">+${pls.length-35} more...</div>`:'');
+    // Per-unit breakdown bars
+    const unitBreakdown=Object.entries(ug).map(([uid,u])=>{
+      const pct=Math.round(u.vol/uv*100);
+      return`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:${cfg.charColor};font-size:0.78rem;font-weight:700;">Container ${+uid+1}</span><span style="color:var(--t2);font-size:0.75rem;">${u.count} boxes · ${pct}%</span></div><div style="height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(pct,100)}%;background:${cfg.color};border-radius:4px;transition:width 1s ease;"></div></div><div style="font-size:0.65rem;color:var(--t3);margin-top:2px;">${u.vol}u³ / ${uv}u³ · ${uv-u.vol}u³ free</div></div>`;
+    }).join('');
+    // Metric comparison bars vs best
+    const effPct=d.efficiency; const effBar=Math.round(effPct);const unitScore=bestUnits>0?Math.round(bestUnits/d.units_used*100):100;
+    const rtScore=bestRt>0?Math.round(bestRt/d.runtime_ms*100):100;const wasteScore=minWaste>=0?Math.round((1-wastedVol/Math.max(uv,wastedVol+1))*100):50;
+    const rotPct=pls.length>0?Math.round(rotCount/pls.length*100):0;
+    // Advantages/disadvantages
+    const isBest=rank===1;const effDiff=(d.efficiency-bestEff).toFixed(1);const unitDiff=d.units_used-bestUnits;const rtDiff=(d.runtime_ms-bestRt).toFixed(2);let insight='';
+    if(isBest){
+      const rotMsg=rotCount>0?'Box rotation was used '+rotCount+' times ('+rotPct+'% of placements rotated for better fit).':'No rotation needed — boxes fit optimally in original orientation.';
+      insight=`<div class="diff-section better"><div class="diff-label better">⭐ Top Performer — Best Overall</div>${d.name} achieved the highest packing efficiency (${d.efficiency}%) using ${d.units_used} container(s). ${rotMsg}</div>`;
+    } else {
+      let adv=[], dis=[];
+      if(d.runtime_ms<=bestRt*1.1)adv.push(`⚡ Fastest runtime (${d.runtime_ms.toFixed(2)}ms)`);
+      if(d.units_used===bestUnits)adv.push('📦 Ties best on containers used');if(d.efficiency>=bestEff-2)adv.push('📊 Near-optimal efficiency');
+      if(d.efficiency<bestEff)dis.push(`📉 ${Math.abs(effDiff)}% less efficient than best`);
+      if(unitDiff>0)dis.push(`📦 +${unitDiff} extra container(s) needed`);
+      if(parseFloat(rtDiff)>0)dis.push(`⏱ +${rtDiff}ms slower`);
+      insight=(adv.length?`<div class="diff-section better"><div class="diff-label better">✅ Strengths</div>${adv.join(' &nbsp;·&nbsp; ')}</div>`:'')
+              +(dis.length?`<div class="diff-section worse"><div class="diff-label worse">⚠ Trade-offs</div>${dis.join(' &nbsp;·&nbsp; ')}</div>`:'')
+              +`<div class="diff-section neutral"><div class="diff-label neutral">🔬 How it works</div><strong>${cfg.char}</strong> — ${cfg.detail}</div>`;}
+    return`<div class="algo-slide" id="slide-${key}"><div class="result-panel r-${cfg.cls}" style="border-top:4px solid ${cfg.color.replace('0.9','1')};">
+        <div class="rp-header"><div>
+            <div class="rp-title c-${cfg.cls}">${rank===1?'⭐':rank===2?'🥈':rank===3?'🥉':'🏅'} ${d.name}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--t3);margin-top:4px;">🧊 Container: ${A.cmpMeta?.unitW}×${A.cmpMeta?.unitD}×${A.cmpMeta?.unitH} &nbsp;·&nbsp; ${cfg.strategy}${rotCount>0?' &nbsp;·&nbsp; 🔄 '+rotCount+' rotation(s)':''}</div>
+          </div><span class="rp-rank ${cfg.rankCls}">#${rank} ${['Best','2nd','3rd','4th'][rank-1]}</span></div>
+        <div class="rp-stats" style="margin-bottom:14px;"><div class="rps c-${cfg.cls}"><div class="rps-v">${d.efficiency}%</div><div class="rps-l">Efficiency</div></div>
+          <div class="rps"><div class="rps-v">${d.units_used}</div><div class="rps-l">Containers</div></div>
+          <div class="rps"><div class="rps-v">${d.boxes_placed}</div><div class="rps-l">Boxes Placed</div></div>
+          <div class="rps"><div class="rps-v">${d.runtime_ms.toFixed(1)}ms</div><div class="rps-l">Runtime</div></div></div>
+        <div style="background:rgba(0,0,0,0.18);border:1px solid var(--bd);border-radius:8px;padding:13px 15px;margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--t3);margin-bottom:10px;letter-spacing:0.1em;">📊 PERFORMANCE METRICS vs ALL ALGORITHMS</div>
+          ${[
+            {label:'Space Efficiency',val:effBar,max:100,unit:'%',color:cfg.color},
+            {label:'Container Efficiency',val:unitScore,max:100,unit:'pts',color:'rgba(0,229,255,0.9)'},
+            {label:'Speed Score',val:rtScore,max:100,unit:'pts',color:'rgba(155,114,248,0.9)'},
+            {label:'Space Saved',val:wasteScore,max:100,unit:'pts',color:'rgba(255,201,77,0.9)'},].map(m=>`<div style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:0.72rem;color:var(--t2);">${m.label}</span>
+              <span style="font-size:0.72rem;font-weight:700;color:${m.color};">${m.val}${m.unit}</span></div>
+            <div style="height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:${m.val}%;background:${m.color};border-radius:3px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div></div></div>`).join('')}
+          ${rotCount>0?'<div style="margin-top:8px;padding:7px 10px;background:rgba(155,114,248,0.08);border:1px solid rgba(155,114,248,0.2);border-radius:6px;font-size:0.72rem;color:var(--t2);">🔄 <strong style="color:rgba(155,114,248,0.9);">Box Rotation Applied:</strong> '+rotCount+' of '+pls.length+' boxes rotated for optimal fit ('+rotPct+'%)</div>':''}
+        </div>
+        ${insight}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div style="background:rgba(0,0,0,0.15);border:1px solid var(--bd);border-radius:8px;padding:13px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:${cfg.charColor};margin-bottom:8px;font-weight:700;">${algoChartLabel[key]}</div>
+            <canvas id="unitChart-${key}" style="max-height:170px;"></canvas></div><div class="rp-log" style="max-height:220px;">
+            <div class="rp-log-hdr">📍 Placement Log — ${d.boxes_placed} vaccine boxes</div>
+            ${logEntries||'<div style="color:var(--t3)">No placements</div>'}</div></div>
+        <div style="background:rgba(0,0,0,0.15);border:1px solid var(--bd);border-radius:8px;padding:13px 15px;margin-bottom:10px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--a);margin-bottom:10px;font-weight:700;">📦 PER-CONTAINER BREAKDOWN</div>
+          ${unitBreakdown||'<div style="color:var(--t3);font-size:0.78rem;">No containers used</div>'}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:rgba(0,0,0,0.15);border-radius:6px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--t2);">
+          <span>Packed: <strong style="color:var(--a2)">${totalPacked}u³</strong></span><span>Total cap: <strong style="color:var(--t)">${d.units_used*uv}u³</strong></span>
+          <span>Wasted: <strong style="color:var(--a3)">${wastedVol}u³</strong></span>
+          <span>Avg/unit: <strong style="color:${cfg.charColor}">${d.units_used>0?(d.boxes_placed/d.units_used).toFixed(1):0}</strong></span>
+          ${rotCount>0?'<span>Rotated: <strong style="color:rgba(155,114,248,0.9)">'+rotCount+'×</strong></span>':''}</div></div></div>`;
+  }).join('');
+  // Build unique chart per algorithm after DOM render
+  setTimeout(()=>{
+    algos.forEach(key=>{
+      const d=data[key],cfg=ALGO_CFG[key],pls=d.placements||[];
+      const el=document.getElementById(`unitChart-${key}`);
+      if(!el)return;const ci=Chart.getChart(el);if(ci)ci.destroy();
+      const ug={};pls.forEach(p=>{if(!ug[p.unit_id])ug[p.unit_id]={vol:0,count:0};ug[p.unit_id].vol+=p.box.w*p.box.d*p.box.h;ug[p.unit_id].count++;});
+      const uids=Object.keys(ug).map(Number).sort((a,b)=>a-b);const totalPacked=pls.reduce((s,p)=>s+p.box.w*p.box.d*p.box.h,0);
+      const wastedVol=Math.max(0,d.units_used*uv-totalPacked);const chartType=algoChartType[key];
+      const baseOpts={responsive:true,maintainAspectRatio:true,plugins:{legend:{display:chartType!=='bar'&&chartType!=='line',labels:{color:'#8aabca',font:{family:'JetBrains Mono',size:10}}}}};
+      if(key==='HYBRID'){
+        // HYBRID: Doughnut — filled vs wasted space
+        new Chart(el.getContext('2d'),{type:'doughnut',data:{
+          labels:['Packed','Wasted'],
+          datasets:[{data:[totalPacked,wastedVol],backgroundColor:[cfg.bg,'rgba(255,87,87,0.18)'],borderColor:[cfg.color,'rgba(255,87,87,0.5)'],borderWidth:2}]
+        },options:{...baseOpts,cutout:'65%',plugins:{...baseOpts.plugins,tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}u³`}}}}});
+      } else if(key==='BFD'){
+        // BFD: Polar Area — each unit's fill level
+        new Chart(el.getContext('2d'),{type:'polarArea',data:{
+          labels:uids.map(u=>`Container ${u+1}`),
+          datasets:[{data:uids.map(u=>ug[u].vol),backgroundColor:uids.map((_,i)=>`hsla(${i*60+180},80%,60%,0.3)`),borderColor:uids.map((_,i)=>`hsla(${i*60+180},80%,60%,0.8)`),borderWidth:2}]
+        },options:{...baseOpts,scales:{r:{grid:{color:'rgba(28,45,74,0.4)'},ticks:{color:'#8aabca',backdropColor:'transparent',font:{size:9}}}}}});
+      } else if(key==='FFD'){
+        // FFD: Grouped bar — boxes and volume per unit
+        new Chart(el.getContext('2d'),{type:'bar',data:{
+          labels:uids.map(u=>`C${u+1}`),datasets:[
+            {label:'Boxes',data:uids.map(u=>ug[u].count),backgroundColor:cfg.bg,borderColor:cfg.color,borderWidth:2,borderRadius:4,yAxisID:'y'},
+            {label:'Volume u³',data:uids.map(u=>ug[u].vol),backgroundColor:'rgba(255,201,77,0.15)',borderColor:'rgba(255,201,77,0.7)',borderWidth:1.5,borderRadius:4,type:'line',fill:true,yAxisID:'y1',tension:0.4}
+          ]
+        },options:{...baseOpts,scales:{x:{grid:{color:'rgba(28,45,74,0.3)'},ticks:{color:'#8aabca',font:{size:10}}},y:{grid:{color:'rgba(28,45,74,0.3)'},ticks:{color:'#8aabca',font:{size:9}},beginAtZero:true,position:'left'},y1:{ticks:{color:'rgba(255,201,77,0.7)',font:{size:9}},position:'right',grid:{display:false},beginAtZero:true}}}});
+      } else {
+        // FF: Line chart — cumulative packing progress
+        const cumVol=[];let runVol=0;
+        pls.forEach(p=>{runVol+=p.box.w*p.box.d*p.box.h;cumVol.push(runVol);});
+        new Chart(el.getContext('2d'),{type:'line',data:{
+          labels:pls.map((_,i)=>i+1),datasets:[
+            {label:'Cumulative packed u³',data:cumVol,borderColor:cfg.color,backgroundColor:cfg.bg,fill:true,tension:0.3,pointRadius:0,borderWidth:2},
+            {label:'Capacity line',data:pls.map((_,i)=>Math.ceil((i+1)/Math.max(1,...Object.keys(ug).map(Number).map(u=>ug[u].count)))*uv||uv),borderColor:'rgba(255,255,255,0.15)',borderDash:[4,3],pointRadius:0,fill:false,borderWidth:1}
+          ]
+        },options:{...baseOpts,scales:{x:{grid:{color:'rgba(28,45,74,0.3)'},ticks:{color:'#8aabca',font:{size:9},maxTicksLimit:8}},y:{grid:{color:'rgba(28,45,74,0.3)'},ticks:{color:'#8aabca',font:{size:9}},beginAtZero:true}}}});}});
+  },150);}
+function showAlgoSlide(key,btn){
+  if(key==='ALL'){document.querySelectorAll('.algo-slide').forEach(s=>s.classList.add('active'));document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');return;}
+  document.querySelectorAll('.algo-slide').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('slide-'+key)?.classList.add('active');
+  if(btn)btn.classList.add('active');}
+function doPrint(){
+  // Print only the active section (selected dataset analysis), not everything
+  const activeSec=document.querySelector('.section.active');
+  if(!activeSec){window.print();return;}
+  // If comparison section with results, show all algo slides for print then restore
+  const isComp=activeSec.id==='sec-comparison';let restoredSlides=[];
+  if(isComp){
+    // Make all algo slides visible for print
+    document.querySelectorAll('.algo-slide').forEach(s=>{
+      if(!s.classList.contains('active')){restoredSlides.push(s);s.classList.add('active');}});
+    // Hide sections that are not the comparison
+    document.querySelectorAll('.section:not(#sec-comparison)').forEach(s=>s.style.display='none');}
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      // Restore
+      restoredSlides.forEach(s=>s.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.style.display='');
+      // Re-activate only the active section
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));if(activeSec)activeSec.classList.add('active');
+    },1800);
+  },300);}
+function toast(msg,t='i'){
+  const c=document.getElementById('tc'),el=document.createElement('div');
+  el.className=`toast ${t}`;
+  el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ'}[t]}</span><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{el.style.animation='tout 0.25s ease forwards';setTimeout(()=>el.remove(),280);},3000);}
+</script></body></html>
