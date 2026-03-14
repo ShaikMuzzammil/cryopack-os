@@ -20,7 +20,7 @@ def handle_preflight():
         r=make_response();r.headers['Access-Control-Allow-Origin']=request.headers.get('Origin','*')
         for k,v in CORS_HEADERS.items():r.headers[k]=v
         return r
-DB=os.path.join(os.path.dirname(os.path.abspath(__file__)),'cryopack.db')
+DB='cryopack.db'
 # DB connection helper
 def db():return sqlite3.connect(DB)
 def init_db():
