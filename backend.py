@@ -161,6 +161,10 @@ for _path,_file in [('/login.html','login.html'),('/index.html','index.html'),('
 @app.route('/<path:filename>')
 def serve_static(filename):
     return send_from_directory('.',filename) if os.path.exists(filename) else({'error':'Not found'},404)
+# Ping route — keeps server alive, used by UptimeRobot every 5 minutes
+@app.route('/ping')
+def ping():
+    return jsonify({'status':'ok','service':'CryoPack OS'}),200
 # Auth decorator
 def require_login(f):
     @wraps(f)
@@ -420,6 +424,23 @@ def compare_algorithms():
         eff=calc_eff(pls,n_units,uw,ud,uh)
         results[algo]={'name':ALGO_NAMES[algo],'efficiency':eff,'units_used':n_units,'boxes_placed':len(pls),'runtime_ms':round(rt,3),'placements':[{'box':p['box'],'x':p['x'],'y':p['y'],'z':p['z'],'unit_id':p['unit_id'],'rotated':p.get('rotated',False)} for p in pls]}
     return jsonify(results),200
+# ── KEEP ALIVE — prevents Render free tier from sleeping ──
+import threading,time,urllib.request
+def self_ping():
+    time.sleep(60)  # wait 1 min after startup before first ping
+    while True:
+        try:
+            url=os.environ.get('RENDER_EXTERNAL_URL','')  # get app URL from Render
+            if url:urllib.request.urlopen(url+'/ping',timeout=10)  # ping own server
+        except:pass  # ignore errors silently
+        time.sleep(840)  # wait 14 mins then ping again (Render sleeps at 15 mins)
+# Lightweight health check route — pinged every 14 minutes
+@app.route('/ping')
+def ping():
+    return jsonify({'status':'ok'}),200
+# Start pinger only on Render — not on local laptop
+if os.environ.get('RENDER'):
+    threading.Thread(target=self_ping,daemon=True).start()
 if __name__=='__main__':
     print("\n CryoPack OS - Starting server...")
     print(f" Mode: {'PostgreSQL (Render)' if USE_PG else 'SQLite (Local)'}")
