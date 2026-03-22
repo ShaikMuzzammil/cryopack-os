@@ -431,7 +431,7 @@ def self_ping():
     while True:
         try:
             url=os.environ.get('RENDER_EXTERNAL_URL','')  # get app URL from Render
-            if url:urllib.request.urlopen(url+'/ping',timeout=10)  # ping own server
+            if url:urllib.request.urlopen(url+'/',timeout=10)  # ping own server
         except:pass  # ignore errors silently
         time.sleep(840)  # wait 14 mins then ping again (Render sleeps at 15 mins)
 # Lightweight health check route — pinged every 14 minutes
