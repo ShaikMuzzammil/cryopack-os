@@ -434,10 +434,6 @@ def self_ping():
             if url:urllib.request.urlopen(url+'/',timeout=10)  # ping own server
         except:pass  # ignore errors silently
         time.sleep(840)  # wait 14 mins then ping again (Render sleeps at 15 mins)
-# Lightweight health check route — pinged every 14 minutes
-@app.route('/ping')
-def ping():
-    return jsonify({'status':'ok'}),200
 # Start pinger only on Render — not on local laptop
 if os.environ.get('RENDER'):
     threading.Thread(target=self_ping,daemon=True).start()
