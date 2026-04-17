@@ -573,7 +573,7 @@ HYBRID result:     All 12 boxes in 1 unit — 39.6% efficiency
 
 ## 📜 License
 
-This project is private. All rights reserved © 2024 Shaik Muzzammil.
+This project is private. All rights reserved © 2026 Shaik Muzzammil.
 
 ---
 
