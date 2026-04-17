@@ -15,7 +15,7 @@ app=Flask(__name__,static_folder='static',static_url_path='/static')
 app.config.update(
     SECRET_KEY=os.environ.get('SECRET_KEY','cryopack-os-secret-2024-vaccine-logistics'),
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE='Lax',
     SESSION_COOKIE_NAME='cryopack_session',
     PERMANENT_SESSION_LIFETIME=timedelta(days=30)
