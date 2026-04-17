@@ -117,41 +117,6 @@ if supported_area >= box.w * box.d * 0.78:
 | **Unit Config** | Set cooling unit W × D × H, shows calculated floor area, volume, estimated max boxes |
 | **Run History Sidebar** | Load any previous packing run — restores all results and 3D view |
 | **Dataset Save/Load** | Save current box queue to database, reload named datasets |
-### CryoPack Terminal (index_1.html)
-A fully interactive **command-line terminal interface** for power users. Features a retro green-on-dark design with Orbitron font.
-**Terminal Commands:**
-| Key | Command | Description |
-|---|---|---|
-| `1` | Configure | Set cooling unit W × D × H dimensions |
-| `2` | Add Boxes | Choose from vaccine presets or enter custom box types with temperature and fragile flags |
-| `3` | Select Algorithms | Pick two algorithms to compare from 10 available |
-| `4` | Run Pack | Execute packing on both algorithms and render 3D |
-| `5` | Analysis | Open full analysis report with 8 performance charts |
-| `6` | Quick Demo | Load demo scenarios (Hospital, Clinic, Mass Vaccine, Pandemic, Pediatric) |
-| `7` | View Config | Show current session configuration |
-| `8` | Benchmark | Run ALL 10 algorithms and rank them in a table |
-| `9` | JSON Export | Download packing results as JSON file |
-| `0` | Reset | Clear all data and start fresh |
-| `S` | Step-fill | Step through box placements one by one with PREV/NEXT/PLAY/PAUSE |
-| `D` | Export 3D | Export 3D visualization as PNG print report |
-| `V` | 3D Inspect | Enter 3D inspection mode with Top/Front/Side/Iso/Auto-spin views |
-| `H` | Help | Show algorithm guide and usage reference |
-**Built-in Vaccine Box Presets:**
-| Preset | Box Types | Total Boxes | Use Case |
-|---|---|---|---|
-| Hospital | 7 types | 42 boxes | Large hospital restocking |
-| Clinic | 6 types | 18 boxes | Small clinic delivery |
-| Mass Vaccine | 8 types | 85 boxes | Mass vaccination campaign |
-| Pandemic | 10 types | 120 boxes | Emergency pandemic response |
-| Pediatric | 6 types | 30 boxes | Children's vaccination drive |
-**Box Properties in Terminal:**
-Each box has: Name, Width × Depth × Height, Temperature requirement (2°C / -20°C / -70°C), Fragile flag, Quantity
-**Dual 3D Storage:**
-- **Top panel** — Primary cooling units shown as blue racks
-- **Bottom panel** — Cold overflow storage shown as separate rack when boxes exceed primary unit
-- Both views are independently interactive (drag, scroll, pan)
-**Step-wise Fill System:**
-Watch boxes enter the cooling unit one by one with Play/Pause/Prev/Next controls and adjustable speed. A slider lets you scrub to any point in the packing sequence.
 ### Algorithm Analysis (analysis.html)
 Full analysis dashboard with:
 | Section | Content |
@@ -165,6 +130,64 @@ Full analysis dashboard with:
 | **Dataset Selector** | Load saved datasets directly from the analysis page |
 | **Override Dims** | Change cooling unit dimensions and rerun without going back to main page |
 | **Print Report** | Export full analysis as printable HTML page |
+---
+## ☁️ Cross‑Device Sync — Your Data Everywhere
+
+CryoPack OS stores all your datasets, packing results, and algorithm comparisons in a **cloud PostgreSQL database** (Neon / Render). This means:
+
+| Device | Action | What happens |
+|--------|--------|---------------|
+| **Laptop** | Save a dataset ("Hospital July") | Data written to cloud database |
+| **Mobile** | Log in with same account | Seamlessly see "Hospital July" in your workspace |
+| **Tablet** | Run a packing comparison | Result saved and available on all devices |
+| **Any device** | Load a previous run | Full 3D view and metrics restored instantly |
+
+### What is synchronised across devices (and what isn't)
+
+| Data type | Sync behaviour | How to sync if needed |
+|-----------|----------------|----------------------|
+| Saved datasets (name + boxes + unit config) | ✅ **Fully synced** | Automatic – appears on all devices after login. |
+| Packing run history (results, placements, efficiency) | ✅ **Fully synced** | Automatic – every run is saved to database. |
+| **Current queue** (boxes waiting to be packed) | ⚠️ **Not auto‑synced** | Save the queue as a dataset (💾 button), then load it on another device. This gives you control. |
+| **3D view state** (camera angle, zoom, active unit) | ❌ **Not synced** | Each device has its own screen size and preferences. Syncing camera would be disorienting. |
+
+> ✅ **Best practice:** After adding boxes to the queue, save it as a dataset. Then you can load it on any device instantly.
+
+### How it works (simple explanation)
+
+1. **You log in** – your browser gets a secure session cookie (now fixed for mobile with `Secure=True` and `SameSite=None`).
+2. **You save a dataset** – the frontend sends a `POST /api/datasets` with the boxes and unit dimensions.
+3. **Backend stores it** – the data is saved to the `datasets` table, linked to your `user_id`.
+4. **You open another device** – the frontend calls `GET /api/datasets`, which returns **all datasets you ever saved**.
+5. **You load a dataset** – the backend fetches the exact box list and unit configuration, then runs the packing algorithm.
+
+> ✅ **No manual transfer. No export/import. Just log in and your data is there.**
+
+### Real‑world benefit for vaccine logistics
+
+A logistics coordinator can:
+
+- **On desktop** – design a box configuration for a new vaccine shipment, test with 10 algorithms, save the best dataset.
+- **On the warehouse tablet** – load the same dataset, run the packing algorithm, and see exactly how to load the cooling unit – **in 3D**.
+- **On mobile** – check the placement log and unit fill percentages while supervising the loading process.
+
+No emailing files, no re‑entering dimensions, no version confusion. **One account, one truth.**
+
+### Security note
+
+- All passwords are hashed with **Werkzeug PBKDF2** – never stored in plain text.
+- Session cookies are `HttpOnly`, `Secure`, and `SameSite=Lax/None` – protected against XSS and CSRF.
+- Database credentials are stored as Render environment variables – never exposed in code.
+
+### Demo (real test)
+
+1. On your laptop, log in and save a dataset called `"Test Sync"`.
+2. On your mobile, open the same URL and log in with the **same username/password**.
+3. Open the Workspace sidebar → **My Datasets** – `"Test Sync"` appears instantly.
+4. Load it, run packing – the 3D view shows the same boxes on both devices.
+
+> **This works because we fixed the mobile cookie issue** – changed `SESSION_COOKIE_SECURE=True` and `SESSION_COOKIE_SAMESITE='None'` in the backend. Without these, mobile browsers would reject the session cookie.
+
 ---
 ## 🔢 All 10 Packing Algorithms
 CryoPack OS implements **10 bin packing heuristics**, more than any similar tool:
@@ -205,12 +228,7 @@ Primary packing interface. Three-column layout:
 - **Left panel** — Unit config, box input, queue, run controls
 - **Center panel** — Dual 3D canvas (storage top, conveyor belt bottom) with draggable divider
 - **Right panel** — Live metrics, unit breakdown, placement log
-### Page 3 — CryoPack Terminal (`index_1.html`)
-Advanced command-line interface. Three-column layout:
-- **Left panel** — Interactive terminal with command prompt and output log
-- **Center panel** — Dual 3D storage (primary units top, cold overflow bottom) with unit tabs
-- **Right panel** — Algorithm output, comparison results, step-wise controls, box legend
-### Page 4 — Algorithm Analysis (`analysis.html`)
+### Page 3 — Algorithm Analysis (`analysis.html`)
 Full-page analysis report:
 - **Left sidebar** — Section navigation (Overview, Algorithms, Comparison, Datasets, Report)
 - **Main content** — Dynamic content based on selected section with Chart.js visualizations
@@ -225,7 +243,6 @@ CryoPack-Os/
 ├── .gitignore           # Excludes cryopack.db, __pycache__, .env
 │
 ├── index.html           # Main dashboard — conveyor belt + dual 3D view
-├── index_1.html         # CryoPack Terminal — v4.0 Ultimate command interface
 ├── login.html           # Login and registration page
 ├── analysis.html        # Algorithm comparison and analysis dashboard
 │
@@ -418,7 +435,7 @@ HYBRID result: All 12 boxes in 1 unit — 39.6% efficiency
 - 📦 Repository: [github.com/ShaikMuzzammil/cryopack-os](https://github.com/ShaikMuzzammil/cryopack-os)
 ---
 ## 📜 License
-This project is private. All rights reserved © 2024 Shaik Muzzammil.
+This project is private. All rights reserved © 2026 Shaik Muzzammil.
 ---
 <div align="center">
 Made with ❄️ for vaccine cold-chain logistics optimization
